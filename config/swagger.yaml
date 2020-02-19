@@ -1,0 +1,132 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: PB - auth service
+  description: PB - auth service
+
+servers:
+  - url: http://localhost:7745
+
+tags:
+  - name: Users
+    description: Users API
+
+paths:
+  /login:
+    post:
+      tags:
+        - Users
+      summary: Authentication
+      description: user login
+      requestBody:
+        description: user credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        200:
+          description: user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+      security: []
+
+  /logout:
+    get:
+      tags:
+        - Users
+      description: user logout
+      responses:
+        200:
+          description: Message - success logout
+        401:
+          description: Unauthorized
+
+  /users/reload:
+    post:
+      tags:
+        - Users
+      summary: Reload users
+      description: Reload users
+      requestBody:
+        description: List of user credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                users:
+                  type: array
+                  required: true
+                  items:
+                    $ref: '#/components/schemas/UserCredentials'
+      responses:
+        200:
+          description: user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    UserCredentials:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          uniqueItems: true
+        password:
+          type: string
+
+    User:
+      type: object
+      required:
+        - id
+        - username
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        token:
+          type: object
+          required:
+            - accessToken
+            - expiresIn
+          properties:
+            accessToken:
+              type: string
+            expiresIn:
+              type: number
+
+security:
+  - bearerAuth: []
